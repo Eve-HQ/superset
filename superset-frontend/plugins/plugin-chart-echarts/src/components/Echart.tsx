@@ -115,7 +115,7 @@ use([
 const loadLocale = async (locale: string) => {
   let lang;
   try {
-    lang = await import(`echarts/lib/i18n/lang${locale}`);
+    lang = await import(/* @vite-ignore */ `echarts/lib/i18n/lang${locale}`);
   } catch {
     // Locale not supported in ECharts
   }
