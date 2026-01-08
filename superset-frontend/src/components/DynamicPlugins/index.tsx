@@ -148,7 +148,7 @@ export const DynamicPluginProvider: FC = ({ children }) => {
         plugins.map(async plugin => {
           let error: Error | null = null;
           try {
-            await import(/* webpackIgnore: true */ plugin.bundle_url);
+            await import(/* @vite-ignore */ /* webpackIgnore: true */ plugin.bundle_url);
           } catch (err) {
             logging.error(
               `Failed to load plugin ${plugin.key} with the following error:`,

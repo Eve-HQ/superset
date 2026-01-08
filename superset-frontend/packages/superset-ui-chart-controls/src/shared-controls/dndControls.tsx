@@ -25,18 +25,17 @@ import {
   Dataset,
   Metric,
   isDataset,
-} from '../types';
-import { DATASET_TIME_COLUMN_OPTION, TIME_FILTER_LABELS } from '../constants';
-import {
-  QUERY_TIME_COLUMN_OPTION,
-  defineSavedMetrics,
-  ColumnOption,
   ColumnMeta,
   FilterOption,
+} from '../types';
+import { DATASET_TIME_COLUMN_OPTION, TIME_FILTER_LABELS, QUERY_TIME_COLUMN_OPTION } from '../constants';
+import { defineSavedMetrics } from '../utils/defineSavedMetrics';
+import { ColumnOption } from '../components/ColumnOption';
+import {
   temporalColumnMixin,
   datePickerInAdhocFilterMixin,
   xAxisMixin,
-} from '..';
+} from './mixins';
 
 type Control = {
   savedMetrics?: Metric[] | null;

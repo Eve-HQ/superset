@@ -55,8 +55,13 @@ const StyledLabel = styled.div`
 export const useLanguageMenuItems = ({
   locale,
   languages,
-}: LanguagePickerProps): MenuItem =>
+}: LanguagePickerProps): MenuItem | null =>
   useMemo(() => {
+    // Return null if no languages configured
+    if (!languages || Object.keys(languages).length === 0) {
+      return null;
+    }
+
     const items: MenuItem[] = Object.keys(languages).map(langKey => ({
       key: langKey,
       label: (
@@ -70,12 +75,17 @@ export const useLanguageMenuItems = ({
       style: { whiteSpace: 'normal', height: 'auto' },
     }));
 
+    const currentLang = languages[locale];
+    if (!currentLang) {
+      return null;
+    }
+
     return {
       key: 'language-submenu',
       type: 'submenu' as const,
       label: (
         <span className="f16" aria-label={t('Languages')}>
-          <i className={`flag ${languages[locale].flag}`} />
+          <i className={`flag ${currentLang.flag}`} />
         </span>
       ),
       icon: <Icons.CaretDownOutlined iconSize="xs" />,
