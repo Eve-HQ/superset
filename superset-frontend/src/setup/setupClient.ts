@@ -62,6 +62,17 @@ function getDefaultConfiguration(): ClientConfig {
     retryOn: retryConfig.SUPERSET_CLIENT_RETRY_STATUS_CODES || [502, 503, 504],
   };
 
+  // Get Eve AI access token from localStorage for Superset API authentication
+  // Superset backend is configured to accept Eve AI Bearer tokens
+  const eveAccessToken = localStorage.getItem('access_token');
+  const headers: Record<string, string> = {};
+
+  if (eveAccessToken) {
+    // Add Bearer token authorization (replaces CSRF token authentication)
+    headers.Authorization = `Bearer ${eveAccessToken}`;
+    console.log('[SupersetClient] Using Eve AI Bearer token for authentication');
+  }
+
   return {
     protocol: ['http:', 'https:'].includes(window?.location?.protocol)
       ? (window?.location?.protocol as 'http:' | 'https:')
@@ -69,6 +80,7 @@ function getDefaultConfiguration(): ClientConfig {
     host: window.location?.host || '',
     csrfToken: csrfToken || cookieCSRFToken,
     fetchRetryOptions,
+    headers,
   };
 }
 
