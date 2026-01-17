@@ -321,8 +321,8 @@ function Welcome({ user, addDangerToast }: WelcomeProps) {
     !activityData?.[TableTab.Other] && !activityData?.[TableTab.Viewed];
 
   const menuData: SubMenuProps = {
-    activeChild: 'Home',
-    name: t('Home'),
+    activeChild: 'Overview',
+    name: t('Overview'),
   };
 
   if (isThumbnailsEnabled) {
@@ -414,24 +414,24 @@ function Welcome({ user, addDangerToast }: WelcomeProps) {
                       />
                     ),
                 },
-                ...(canReadSavedQueries
-                  ? [
-                      {
-                        key: 'saved-queries',
-                        label: t('Saved queries'),
-                        children: !queryData ? (
-                          <LoadingCards cover={checked} />
-                        ) : (
-                          <SavedQueries
-                            showThumbnails={checked}
-                            user={user}
-                            mine={queryData}
-                            featureFlag={isThumbnailsEnabled}
-                          />
-                        ),
-                      },
-                    ]
-                  : []),
+                // ...(canReadSavedQueries
+                //   ? [
+                //       {
+                //         key: 'saved-queries',
+                //         label: t('Saved queries'),
+                //         children: !queryData ? (
+                //           <LoadingCards cover={checked} />
+                //         ) : (
+                //           <SavedQueries
+                //             showThumbnails={checked}
+                //             user={user}
+                //             mine={queryData}
+                //             featureFlag={isThumbnailsEnabled}
+                //           />
+                //         ),
+                //       },
+                //     ]
+                //   : []),
               ]}
             />
           </>

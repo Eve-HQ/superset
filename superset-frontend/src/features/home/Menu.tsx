@@ -321,22 +321,22 @@ export function Menu({
     return <>{link}</>;
   };
   return (
-    <StyledHeader className="top" id="main-menu" role="navigation">
+    <StyledHeader className="top flex items-center justify-center" id="main-menu" role="navigation">
       <StyledRow>
         <StyledCol md={16} xs={24}>
-          <Tooltip
+          {/* <Tooltip
             id="brand-tooltip"
             placement="bottomLeft"
             title={brand.tooltip}
             arrow={{ pointAtCenter: true }}
           >
             {renderBrand()}
-          </Tooltip>
-          {brand.text && (
+          </Tooltip> */}
+          {/* {brand.text && (
             <StyledBrandText>
               <span>{brand.text}</span>
             </StyledBrandText>
-          )}
+          )} */}
           <StyledMainNav
             mode="horizontal"
             data-test="navbar-top"
@@ -363,7 +363,7 @@ export function Menu({
             })}
           />
         </StyledCol>
-        <Col md={8} xs={24}>
+        {/* <Col md={8} xs={24}>
           <RightMenu
             align={screens.md ? 'flex-end' : 'flex-start'}
             settings={settings}
@@ -371,7 +371,7 @@ export function Menu({
             isFrontendRoute={isFrontendRoute}
             environmentTag={environmentTag}
           />
-        </Col>
+        </Col> */}
       </StyledRow>
     </StyledHeader>
   );

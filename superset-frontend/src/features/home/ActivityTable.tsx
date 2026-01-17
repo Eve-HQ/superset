@@ -94,10 +94,19 @@ const getEntityIcon = (entity: ActivityObject) => {
 };
 
 const getEntityUrl = (entity: ActivityObject) => {
-  if ('sql' in entity) return `/sqllab?savedQueryId=${entity.id}`;
-  if ('url' in entity) return entity.url;
-  return entity.item_url;
+  console.log("entity--->", entity);
+
+  if ("sql" in entity) return `/sqllab?savedQueryId=${entity.id}`;
+
+  if ("url" in entity) return entity.url;
+
+  if (entity.item_url) {
+    return entity.item_url.replace(/^\/superset/, "/analytics");
+  }
+
+  return "/";
 };
+
 
 const getEntityLastActionOn = (entity: ActivityObject) => {
   if ('time' in entity) {
@@ -177,6 +186,8 @@ export default function ActivityTable({
     return activities.map((entity: ActivityObject) => {
       const url = getEntityUrl(entity);
       const lastActionOn = getEntityLastActionOn(entity);
+
+      console.log("url----->",url)
       return (
         <CardStyles key={url}>
           <Link to={url}>

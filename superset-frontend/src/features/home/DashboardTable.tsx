@@ -200,7 +200,7 @@ function DashboardTable({
             name: t('Dashboard'),
             buttonStyle: 'secondary',
             onClick: () => {
-              navigateTo('/dashboard/new', { assign: true });
+              navigateTo('/analytics/dashboard/new', { assign: true });
             },
           },
           {
@@ -209,10 +209,10 @@ function DashboardTable({
             onClick: () => {
               const target =
                 activeTab === TableTab.Favorite
-                  ? `/dashboard/list/?filters=(favorite:(label:${t(
+                  ? `/analytics/dashboard/list/?filters=(favorite:(label:${t(
                       'Yes',
                     )},value:!t))`
-                  : '/dashboard/list/';
+                  : '/analytics/dashboard/list/';
               history.push(target);
             },
           },

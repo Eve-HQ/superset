@@ -65,7 +65,7 @@ const StyledCrossLinks = styled.div`
 function CrossLinks({
   crossLinks,
   maxLinks = 20,
-  linkPrefix = '/superset/dashboard/',
+  linkPrefix = '/dashboard/',
   external = false,
 }: CrossLinksProps) {
   const [crossLinksRef, plusRef, elementsTruncated, hasHiddenElements] =
@@ -81,9 +81,11 @@ function CrossLinks({
         {crossLinks.map((link, index) => (
           <Link
             key={link.id}
-            to={linkPrefix + link.id}
+            to={`/analytics${linkPrefix + link.id}`}
             {...(external && { target: '_blank', rel: 'noopener noreferrer' })}
           >
+
+            {console.log(`/analytics${linkPrefix + link.id}`)}
             {index === 0 ? link.title : `, ${link.title}`}
           </Link>
         ))}

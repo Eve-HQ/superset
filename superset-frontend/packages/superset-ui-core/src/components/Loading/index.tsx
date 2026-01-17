@@ -1,110 +1,118 @@
+import React from 'react';
+import styled from '@emotion/styled';
+import cls from 'classnames';
+import type { LoadingProps } from './types';
+
 /**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Simple CSS Loader
+ * - Replaces SVG loader with a CSS-based spinning ring
+ * - Keeps same API: position classes (inline, inline-centered, floating)
+ * - Theme-aware (dark/light)
  */
 
-import cls from 'classnames';
-import { styled, useTheme } from '@apache-superset/core/ui';
-import { Loading as LoaderSvg } from '../assets';
-import type { LoadingProps, SizeOption } from './types';
-
-const SIZE_MAP: Record<SizeOption, string> = {
-  s: '40px',
-  m: '70px',
-  l: '100px',
-};
-
-const LoaderWrapper = styled.div<{
-  $spinnerWidth: string;
-  $spinnerHeight: string;
-  $opacity: number;
-}>`
+const Wrapper = styled.div`
   z-index: 99;
-  width: ${({ $spinnerWidth }) => $spinnerWidth};
-  height: ${({ $spinnerHeight }) => $spinnerHeight};
-  opacity: ${({ $opacity }) => $opacity};
+  display: inline-block;
   position: relative;
-  margin: 0;
-  padding: 0;
+  pointer-events: none;
 
-  & > svg,
-  & > img {
-    width: 100%;
-    height: 100%;
+  &.inline {
+    width: 30px;
+    height: 30px;
+    margin: 0;
   }
 
   &.inline-centered {
+    width: 30px;
+    height: 30px;
     margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: block;
   }
+
   &.floating {
+    width: 50px;
+    height: 50px;
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+    margin: 0;
   }
 `;
+
+const Loader = styled.div`
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #006239;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  /* Inherit size from wrapper */
+  .inline & {
+    width: 30px;
+    height: 30px;
+  }
+
+  .inline-centered & {
+    width: 30px;
+    height: 30px;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Dark/light theme support */
+  @media (prefers-color-scheme: dark) {
+    border-color: rgba(255, 255, 255, 0.3);
+    border-top-color: #00cc66;
+  }
+
+  @media (prefers-color-scheme: light) {
+    border-color: rgba(0, 0, 0, 0.1);
+    border-top-color: #007b3e;
+  }
+
+  :root[data-theme='dark'] & {
+    border-color: rgba(255, 255, 255, 0.3);
+    border-top-color: #00cc66;
+  }
+
+  :root[data-theme='light'] & {
+    border-color: rgba(0, 0, 0, 0.1);
+    border-top-color: #007b3e;
+  }
+`;
+
+const Label = styled.div`
+  text-align: center;
+  margin-top: 12px;
+  font-size: 16px;
+  color: white;
+
+  @media (prefers-color-scheme: light) {
+    color: #000;
+  }
+`;
+
 export function Loading({
   position = 'floating',
-  image,
   className,
-  size = 'm',
-  muted = false,
 }: LoadingProps) {
-  const theme = useTheme();
-
-  // Determine size from size prop
-  const spinnerSize = SIZE_MAP[size];
-
-  // Opacity - muted reduces to 0.25, otherwise full opacity
-  const opacity = muted ? 0.25 : 1.0;
-
-  // Render spinner content
-  const renderSpinner = () => {
-    // Precedence: explicit image prop > brandSpinnerSvg > brandSpinnerUrl > default SVG
-    if (image) {
-      return <img src={image} alt="Loading..." />;
-    }
-    if (theme.brandSpinnerSvg) {
-      const svgDataUri = `data:image/svg+xml;base64,${btoa(theme.brandSpinnerSvg)}`;
-      return <img src={svgDataUri} alt="Loading..." />;
-    }
-    if (theme.brandSpinnerUrl) {
-      return <img src={theme.brandSpinnerUrl} alt="Loading..." />;
-    }
-    // Default: use the imported SVG component
-    return <LoaderSvg />;
-  };
-
   return (
-    <LoaderWrapper
-      $spinnerWidth={spinnerSize}
-      $spinnerHeight="auto"
-      $opacity={opacity}
+    <Wrapper
       className={cls('loading', position, className)}
       role="status"
       aria-live="polite"
       aria-label="Loading"
       data-test="loading-indicator"
     >
-      {renderSpinner()}
-    </LoaderWrapper>
+      <Loader />
+      <Label>Loading...</Label>
+    </Wrapper>
   );
 }
 

@@ -337,7 +337,7 @@ function DashboardList(props: DashboardListProps) {
             },
           },
         }: any) => (
-          <Link to={url} title={dashboardTitle}>
+          <Link to={url.replace("/superset/", "/analytics/")} title={dashboardTitle}>
             {certifiedBy && (
               <>
                 <CertifiedBadge
@@ -722,7 +722,7 @@ function DashboardList(props: DashboardListProps) {
       name: t('Dashboard'),
       buttonStyle: 'primary',
       onClick: () => {
-        navigateTo('/dashboard/new', { assign: true });
+        navigateTo('/analytics/dashboard/new', { assign: true });
       },
     });
   }
