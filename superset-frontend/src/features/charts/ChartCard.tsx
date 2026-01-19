@@ -1,3 +1,4 @@
+
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,9 +17,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 import { isFeatureEnabled, FeatureFlag, t } from '@superset-ui/core';
 import { css } from '@apache-superset/core/ui';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   ConfirmStatusChange,
   Button,
@@ -67,10 +69,12 @@ export default function ChartCard({
   userId,
   handleBulkChartExport,
 }: ChartCardProps) {
-  const history = useHistory();
+  const navigate = useNavigate();
+
   const canEdit = hasPerm('can_write');
   const canDelete = hasPerm('can_write');
   const canExport = hasPerm('can_export');
+
   const menuItems: MenuItem[] = [];
 
   if (canEdit) {
@@ -164,7 +168,7 @@ export default function ChartCard({
     <CardStyles
       onClick={() => {
         if (!bulkSelectEnabled && chart.url) {
-          history.push(chart.url);
+          navigate(chart.url);
         }
       }}
     >

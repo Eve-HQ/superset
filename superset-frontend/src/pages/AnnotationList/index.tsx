@@ -18,7 +18,7 @@
  */
 
 import { useMemo, useState, useEffect, useCallback } from 'react';
-import { useParams, Link, useHistory } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { t, SupersetClient, getClientErrorObject } from '@superset-ui/core';
 import { css, styled } from '@apache-superset/core/ui';
 import { extendedDayjs as dayjs } from '@superset-ui/core/utils/dates';
@@ -249,7 +249,7 @@ function AnnotationList({
   let hasHistory = true;
 
   try {
-    useHistory();
+    useLocation();
   } catch (err) {
     // If error is thrown, we know not to use <Link> in render
     hasHistory = false;

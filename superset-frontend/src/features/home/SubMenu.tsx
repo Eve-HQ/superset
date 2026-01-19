@@ -16,9 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 import { ReactNode, useState, useEffect, FunctionComponent } from 'react';
 
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { t } from '@superset-ui/core';
 import { styled, SupersetTheme, css, useTheme } from '@apache-superset/core/ui';
 import cx from 'classnames';
@@ -35,6 +36,8 @@ import { IconType } from '@superset-ui/core/components/Icons/types';
 import { MenuObjectProps } from 'src/types/bootstrapTypes';
 import { Typography } from '@superset-ui/core/components/Typography';
 
+/* ---------------------------------- Styles --------------------------------- */
+
 const StyledHeader = styled.div<{ backgroundColor?: string }>`
   background-color: ${({ theme, backgroundColor }) =>
     backgroundColor || theme.colorBgContainer};
@@ -43,6 +46,7 @@ const StyledHeader = styled.div<{ backgroundColor?: string }>`
   padding: ${({ theme }) => theme.sizeUnit * 2}px
     ${({ theme }) => theme.sizeUnit * 4}px;
   margin-bottom: ${({ theme }) => theme.sizeUnit * 4}px;
+
   .header {
     font-weight: ${({ theme }) => theme.fontWeightStrong};
     margin-right: ${({ theme }) => theme.sizeUnit * 3}px;
@@ -51,27 +55,32 @@ const StyledHeader = styled.div<{ backgroundColor?: string }>`
     display: inline-block;
     line-height: ${({ theme }) => theme.sizeUnit * 9}px;
   }
+
   .nav-right {
     display: flex;
     align-items: center;
-    /* margin-right: ${({ theme }) => theme.sizeUnit * 3}px; */
     float: right;
     position: absolute;
     right: ${({ theme }) => theme.sizeUnit * 4}px;
+
     ul.ant-menu-root {
       padding: 0px;
     }
+
     .ant-row {
       align-items: center;
     }
+
     li[role='menuitem'] {
       border: 0;
       border-bottom: none;
+
       &:hover {
         border-bottom: transparent;
       }
     }
   }
+
   .nav-right-collapse {
     display: flex;
     align-items: center;
@@ -80,6 +89,7 @@ const StyledHeader = styled.div<{ backgroundColor?: string }>`
     float: left;
     padding-left: 10px;
   }
+
   .menu {
     align-items: center;
   }
@@ -95,6 +105,7 @@ const StyledHeader = styled.div<{ backgroundColor?: string }>`
         ${({ theme }) => theme.sizeUnit * 4}px;
       margin-right: ${({ theme }) => theme.sizeUnit}px;
     }
+
     .ant-menu-item:hover,
     .ant-menu-item:has(> span > .active) {
       background-color: ${({ theme }) => theme.colorPrimaryBgHover};
@@ -105,6 +116,7 @@ const StyledHeader = styled.div<{ backgroundColor?: string }>`
   .btn-link {
     padding: 10px 0;
   }
+
   @media (max-width: 767px) {
     .header,
     .nav-right {
@@ -126,6 +138,8 @@ const styledDisabled = (theme: SupersetTheme) => css`
     background-color: ${theme.colorBgContainerDisabled};
   }
 `;
+
+/* ----------------------------------- Types ---------------------------------- */
 
 type MenuChild = {
   label: string;
@@ -152,14 +166,13 @@ export interface SubMenuProps {
   name?: string | ReactNode;
   tabs?: MenuChild[];
   activeChild?: MenuChild['name'];
-  /* If usesRouter is true, a react-router <Link> component will be used instead of href.
-   *  ONLY set usesRouter to true if SubMenu is wrapped in a react-router <Router>;
-   *  otherwise, a 'You should not use <Link> outside a <Router>' error will be thrown */
   usesRouter?: boolean;
   color?: string;
   dropDownLinks?: Array<MenuObjectProps>;
   backgroundColor?: string;
 }
+
+/* -------------------------------- Component --------------------------------- */
 
 const { SubMenu } = MainNav;
 
@@ -168,13 +181,14 @@ const SubMenuComponent: FunctionComponent<SubMenuProps> = props => {
   const [navRightStyle, setNavRightStyle] = useState('nav-right');
   const theme = useTheme();
 
-  let hasHistory = true;
-  // If no parent <Router> component exists, useHistory throws an error
+  let hasNavigation = true;
+
+  // If no parent <Router> component exists, useLocation throws an error
   try {
-    useHistory();
+    useLocation();
   } catch (err) {
     // If error is thrown, we know not to use <Link> in render
-    hasHistory = false;
+    hasNavigation = false;
   }
 
   useEffect(() => {
@@ -182,21 +196,16 @@ const SubMenuComponent: FunctionComponent<SubMenuProps> = props => {
       if (window.innerWidth <= 767) setMenu('inline');
       else setMenu('horizontal');
 
-      if (
-        props.buttons &&
-        props.buttons.length >= 3 &&
-        window.innerWidth >= 795
-      ) {
-        // eslint-disable-next-line no-unused-expressions
+      if (props.buttons && props.buttons.length >= 3 && window.innerWidth >= 795)
         setNavRightStyle('nav-right');
-      } else if (
+      else if (
         props.buttons &&
         props.buttons.length >= 3 &&
         window.innerWidth <= 795
-      ) {
+      )
         setNavRightStyle('nav-right-collapse');
-      }
     }
+
     handleResize();
     const resize = debounce(handleResize, 10);
     window.addEventListener('resize', resize);
@@ -207,12 +216,13 @@ const SubMenuComponent: FunctionComponent<SubMenuProps> = props => {
     <StyledHeader backgroundColor={props.backgroundColor}>
       <Row className="menu" role="navigation">
         {props.name && <div className="header">{props.name}</div>}
+
         <Menu
           mode={showMenu}
           disabledOverflow
           role="tablist"
           items={props.tabs?.map(tab => {
-            if ((props.usesRouter || hasHistory) && !!tab.usesRouter) {
+            if ((props.usesRouter || hasNavigation) && tab.usesRouter) {
               return {
                 key: tab.label,
                 label: (
@@ -230,6 +240,7 @@ const SubMenuComponent: FunctionComponent<SubMenuProps> = props => {
                 ),
               };
             }
+
             return {
               key: tab.label,
               label: (
@@ -248,10 +259,16 @@ const SubMenuComponent: FunctionComponent<SubMenuProps> = props => {
             };
           })}
         />
+
         <div className={navRightStyle}>
           <Menu mode="horizontal" triggerSubMenuAction="click" disabledOverflow>
             {props.dropDownLinks?.map((link, i) => (
               <SubMenu
+                key={i}
+                title={link.label}
+                icon={<Icons.CaretDownOutlined />}
+                popupOffset={[10, 20]}
+                className="dropdown-menu-links"
                 css={css`
                   [data-icon='caret-down'] {
                     color: ${theme.colorIcon};
@@ -259,42 +276,33 @@ const SubMenuComponent: FunctionComponent<SubMenuProps> = props => {
                     margin-left: ${theme.sizeUnit}px;
                   }
                 `}
-                key={i}
-                title={link.label}
-                icon={<Icons.CaretDownOutlined />}
-                popupOffset={[10, 20]}
-                className="dropdown-menu-links"
               >
                 {link.childs?.map(item => {
-                  if (typeof item === 'object') {
-                    return item.disable ? (
-                      <MainNav.Item
-                        key={item.label}
-                        css={styledDisabled}
-                        disabled
+                  if (typeof item !== 'object') return null;
+
+                  return item.disable ? (
+                    <MainNav.Item key={item.label} css={styledDisabled} disabled>
+                      <Tooltip
+                        placement="top"
+                        title={t(
+                          "Enable 'Allow file uploads to database' in any database's settings",
+                        )}
                       >
-                        <Tooltip
-                          placement="top"
-                          title={t(
-                            "Enable 'Allow file uploads to database' in any database's settings",
-                          )}
-                        >
-                          {item.label}
-                        </Tooltip>
-                      </MainNav.Item>
-                    ) : (
-                      <MainNav.Item key={item.label}>
-                        <Typography.Link href={item.url} onClick={item.onClick}>
-                          {item.label}
-                        </Typography.Link>
-                      </MainNav.Item>
-                    );
-                  }
-                  return null;
+                        {item.label}
+                      </Tooltip>
+                    </MainNav.Item>
+                  ) : (
+                    <MainNav.Item key={item.label}>
+                      <Typography.Link href={item.url} onClick={item.onClick}>
+                        {item.label}
+                      </Typography.Link>
+                    </MainNav.Item>
+                  );
                 })}
               </SubMenu>
             ))}
           </Menu>
+
           {props.buttons?.map((btn, i) => (
             <Button
               key={i}
@@ -309,6 +317,7 @@ const SubMenuComponent: FunctionComponent<SubMenuProps> = props => {
           ))}
         </div>
       </Row>
+
       {props.children}
     </StyledHeader>
   );

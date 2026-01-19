@@ -16,14 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { PureComponent, ReactNode } from 'react';
+import { PureComponent, ReactNode, FC } from 'react';
 import rison from 'rison';
 import { isDefined, JsonResponse, SupersetClient, t } from '@superset-ui/core';
 import { styled } from '@apache-superset/core/ui';
 import { withTheme, Theme } from '@emotion/react';
 import { getUrlParam } from 'src/utils/urlUtils';
 import { FilterPlugins, URL_PARAMS } from 'src/constants';
-import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   AsyncSelect,
   Button,
@@ -44,10 +44,11 @@ import {
 } from 'src/features/datasets/DatasetSelectLabel';
 import { Icons } from '@superset-ui/core/components/Icons';
 
-export interface ChartCreationProps extends RouteComponentProps {
+export interface ChartCreationProps {
   user: UserWithPermissionsAndRoles;
   addSuccessToast: (arg: string) => void;
   theme: Theme;
+  navigate: (path: string) => void;
 }
 
 export type ChartCreationState = {
@@ -223,7 +224,7 @@ export class ChartCreation extends PureComponent<
   }
 
   gotoSlice() {
-    this.props.history.push(this.exploreUrl());
+    this.props.navigate(this.exploreUrl());
   }
 
   changeDatasource(datasource: { label: string | ReactNode; value: string }) {
@@ -385,4 +386,9 @@ export class ChartCreation extends PureComponent<
   }
 }
 
-export default withRouter(withToasts(withTheme(ChartCreation)));
+const ChartCreationWrapper = (props: Omit<ChartCreationProps, 'navigate'>) => {
+  const navigate = useNavigate();
+  return <ChartCreation {...props} navigate={navigate} />;
+};
+
+export default withToasts(withTheme(ChartCreationWrapper));

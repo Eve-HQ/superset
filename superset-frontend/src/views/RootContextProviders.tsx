@@ -17,7 +17,6 @@
  * under the License.
  */
 
-import { Route } from 'react-router-dom';
 import { getExtensionsRegistry } from '@superset-ui/core';
 import { Provider as ReduxProvider } from 'react-redux';
 import { QueryParamProvider } from 'use-query-params';
@@ -46,7 +45,6 @@ export const RootContextProviders: React.FC = ({ children }) => {
           <EmbeddedUiConfigProvider>
             <DynamicPluginProvider>
               <QueryParamProvider
-                ReactRouterRoute={Route}
                 stringifyOptions={{ encode: false }}
               >
                 <ExtensionsProvider>

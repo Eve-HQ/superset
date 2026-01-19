@@ -20,7 +20,7 @@ import 'src/public-path';
 
 import { lazy, Suspense } from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { makeApi, t, logging } from '@superset-ui/core';
 import { type SupersetThemeConfig, ThemeMode } from '@apache-superset/core/ui';
 import Switchboard from '@superset-ui/switchboard';
@@ -100,8 +100,10 @@ const EmbeddedRoute = () => (
 const EmbeddedApp = () => (
   <Router basename={applicationRoot()}>
     {/* todo (embedded) remove this line after uuids are deployed */}
-    <Route path="/dashboard/:idOrSlug/embedded/" component={EmbeddedRoute} />
-    <Route path="/embedded/:uuid/" component={EmbeddedRoute} />
+    <Routes>
+      <Route path="/dashboard/:idOrSlug/embedded/" element={<EmbeddedRoute />} />
+      <Route path="/embedded/:uuid/" element={<EmbeddedRoute />} />
+    </Routes>
   </Router>
 );
 

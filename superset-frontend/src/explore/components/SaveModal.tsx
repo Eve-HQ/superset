@@ -17,11 +17,11 @@
  * under the License.
  */
 /* eslint camelcase: 0 */
-import { ChangeEvent, FormEvent, Component } from 'react';
+import { ChangeEvent, FormEvent, Component, FC } from 'react';
 import { Dispatch } from 'redux';
 import rison from 'rison';
 import { connect } from 'react-redux';
-import { withRouter, RouteComponentProps } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   InfoTooltip,
   Button,
@@ -55,7 +55,8 @@ import { Dashboard } from 'src/types/Dashboard';
 // Session storage key for recent dashboard
 const SK_DASHBOARD_ID = 'save_chart_recent_dashboard';
 
-interface SaveModalProps extends RouteComponentProps {
+interface SaveModalProps {
+  navigate: (path: string, options?: { replace?: boolean }) => void;
   addDangerToast: (msg: string) => void;
   actions: Record<string, any>;
   form_data?: Record<string, any>;
@@ -282,12 +283,12 @@ class SaveModal extends Component<SaveModalProps, SaveModalState> {
       // Go to new dashboard url
       if (gotodash && dashboard) {
         this.props.dispatch(removeChartState(value.id));
-        this.props.history.push(dashboard.url);
+        this.props.navigate(dashboard.url);
         return;
       }
 
       const searchParams = this.handleRedirect(window.location.search, value);
-      this.props.history.replace(`/explore/?${searchParams.toString()}`);
+      this.props.navigate(`/explore/?${searchParams.toString()}`, { replace: true });
 
       this.setState({ isLoading: false });
       this.onHide();
@@ -533,7 +534,12 @@ function mapStateToProps({
   };
 }
 
-export default withRouter(connect(mapStateToProps)(SaveModal));
+const SaveModalWrapper: FC<Omit<SaveModalProps, 'navigate'>> = (props) => {
+  const navigate = useNavigate();
+  return <SaveModal {...props} navigate={navigate} />;
+};
+
+export default connect(mapStateToProps)(SaveModalWrapper);
 
 // User for testing purposes need to revisit once we convert this to functional component
 export { SaveModal as PureSaveModal };

@@ -18,7 +18,7 @@
  */
 import { getClientErrorObject, t } from '@superset-ui/core';
 import { useEffect, useRef, useCallback, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate, useBlocker } from 'react-router-dom';
 import { useBeforeUnload } from 'src/hooks/useBeforeUnload';
 import type { Location } from 'history';
 
@@ -35,11 +35,10 @@ export const useUnsavedChangesPrompt = ({
   isSaveModalVisible = false,
   manualSaveOnUnsavedChanges = false,
 }: UseUnsavedChangesPromptProps) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
 
   const confirmNavigationRef = useRef<(() => void) | null>(null);
-  const unblockRef = useRef<() => void>(() => {});
   const manualSaveRef = useRef(false); // Track if save was user-initiated (not via navigation)
 
   const handleConfirmNavigation = useCallback(() => {
@@ -69,38 +68,36 @@ export const useUnsavedChangesPrompt = ({
     onSave();
   }, [onSave]);
 
-  const blockCallback = useCallback(
-    ({
-      pathname,
-      state,
-    }: {
-      pathname: Location['pathname'];
-      state: Location['state'];
-    }) => {
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) => {
       if (manualSaveRef.current) {
         manualSaveRef.current = false;
-        return undefined;
+        return false;
       }
 
-      confirmNavigationRef.current = () => {
-        unblockRef.current?.();
-        history.push(pathname, state);
-      };
+      if (!hasUnsavedChanges) {
+        return false;
+      }
 
-      setShowModal(true);
+      if (currentLocation.pathname !== nextLocation.pathname) {
+        confirmNavigationRef.current = () => {
+          blocker.proceed();
+          navigate(nextLocation.pathname, { state: nextLocation.state });
+        };
+
+        setShowModal(true);
+        return true;
+      }
+
       return false;
     },
-    [history],
   );
 
   useEffect(() => {
-    if (!hasUnsavedChanges) return undefined;
-
-    const unblock = history.block(blockCallback);
-    unblockRef.current = unblock;
-
-    return () => unblock();
-  }, [blockCallback, hasUnsavedChanges, history]);
+    if (!hasUnsavedChanges && blocker.state === 'blocked') {
+      blocker.reset();
+    }
+  }, [hasUnsavedChanges, blocker]);
 
   useEffect(() => {
     if (!isSaveModalVisible && manualSaveRef.current) {

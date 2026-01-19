@@ -101,9 +101,9 @@ setupClient({ appRoot: applicationRoot() });
   if (bootstrapData.user?.isActive) {
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
-        getMe().catch(() => {
-          // SupersetClient will redirect to login on 401
-        });
+        // getMe().catch(() => {
+        //   // SupersetClient will redirect to login on 401
+        // });
       }
     });
   }
