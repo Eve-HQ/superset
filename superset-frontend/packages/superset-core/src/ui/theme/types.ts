@@ -54,9 +54,9 @@ export enum ThemeAlgorithm {
  * - SYSTEM: System theme (auto-detects based on system settings)
  */
 export enum ThemeMode {
-  DEFAULT = 'default',
+  DEFAULT = 'dark',
   DARK = 'dark',
-  SYSTEM = 'system',
+  SYSTEM = 'dark',
 }
 
 /**

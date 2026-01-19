@@ -312,15 +312,15 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
           let titleLink: JSX.Element;
           if (PREVENT_UNSAFE_DEFAULT_URLS_ON_DATASET) {
             titleLink = (
-              <Link data-test="internal-link" to={exploreURL}>
-                {datasetTitle}
+              <Link data-test="internal-link" to={`/analytics${exploreURL}`}>
+                {datasetTitle}1
               </Link>
             );
           } else {
             titleLink = (
               // exploreUrl can be a link to Explore or an external link
               // in the first case use SPA routing, else use HTML anchor
-              <GenericLink to={exploreURL}>{datasetTitle}</GenericLink>
+              <GenericLink to={exploreURL}>{datasetTitle}2</GenericLink>
             );
           }
           try {
@@ -670,7 +670,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
       icon: <Icons.PlusOutlined iconSize="m" />,
       name: t('Dataset'),
       onClick: () => {
-        history.push('/dataset/add/');
+        history.push('/analytics/dataset/add/');
       },
       buttonStyle: 'primary',
     });

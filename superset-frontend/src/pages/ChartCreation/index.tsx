@@ -215,7 +215,7 @@ export class ChartCreation extends PureComponent<
 
   exploreUrl() {
     const dashboardId = getUrlParam(URL_PARAMS.dashboardId);
-    let url = `/explore/?viz_type=${this.state.vizType}&datasource=${this.state.datasource?.value}`;
+    let url = `/analytics/explore/?viz_type=${this.state.vizType}&datasource=${this.state.datasource?.value}`;
     if (isDefined(dashboardId)) {
       url += `&dashboard_id=${dashboardId}`;
     }

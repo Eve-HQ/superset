@@ -805,6 +805,7 @@ function ExploreViewContainer(props) {
               />
             </span>
           </div>
+    
           <DataSourcePanel
             formData={props.form_data}
             datasource={props.datasource}

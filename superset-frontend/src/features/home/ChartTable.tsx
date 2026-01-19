@@ -201,7 +201,7 @@ function ChartTable({
             name: t('Chart'),
             buttonStyle: 'secondary',
             onClick: () => {
-              navigateTo('/chart/add', { assign: true });
+              navigateTo('/analytics/chart/add', { assign: true });
             },
           },
           {
@@ -210,10 +210,10 @@ function ChartTable({
             onClick: () => {
               const target =
                 activeTab === TableTab.Favorite
-                  ? `/chart/list/?filters=(favorite:(label:${t(
+                  ? `/analytics/chart/list/?filters=(favorite:(label:${t(
                       'Yes',
                     )},value:!t))`
-                  : '/chart/list/';
+                  : '/analytics/chart/list/';
               history.push(target);
             },
           },

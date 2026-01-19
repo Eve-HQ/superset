@@ -354,7 +354,7 @@ function ChartList(props: ChartListProps) {
           },
         }: any) => (
           <FlexRowContainer>
-            <Link to={url} data-test={`${sliceName}-list-chart-title`}>
+            <Link to={`/analytics${url}`} data-test={`${sliceName}-list-chart-title`}>
               {certifiedBy && (
                 <>
                   <CertifiedBadge
@@ -399,9 +399,13 @@ function ChartList(props: ChartListProps) {
               : dsNameTxt // No schema, use the full name
             : '';
 
+
+
           return (
             <Tooltip title={dsNameTxt} placement="top">
-              <GenericLink to={dsUrl}>{displayName}</GenericLink>
+
+
+              <GenericLink to={`/analytics${dsUrl}`}>{displayName}</GenericLink>
             </Tooltip>
           );
         },
@@ -416,7 +420,11 @@ function ChartList(props: ChartListProps) {
           row: {
             original: { dashboards },
           },
-        }: any) => <DashboardCrossLinks dashboards={dashboards} />,
+        }: any) => {
+        
+        return <DashboardCrossLinks dashboards={dashboards} />
+      
+      },
         Header: t('On dashboards'),
         accessor: 'dashboards',
         disableSortBy: true,
@@ -813,7 +821,7 @@ function ChartList(props: ChartListProps) {
       name: t('Chart'),
       buttonStyle: 'primary',
       onClick: () => {
-        history.push('/chart/add');
+        history.push('/analytics/chart/add');
       },
     });
   }
