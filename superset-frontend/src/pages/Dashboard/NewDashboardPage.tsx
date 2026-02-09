@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import { Loading } from '../../../packages/superset-ui-core/src/components/Loading';
-import { SupersetClient } from '@superset-ui/core';
 import { setEditMode } from 'src/dashboard/actions/dashboardState';
 import { logEvent } from 'src/logger/actions';
 import { LOG_ACTIONS_TOGGLE_EDIT_DASHBOARD } from 'src/logger/LogUtils';
@@ -46,17 +45,29 @@ export default function NewDashboardPage() {
   useEffect(() => {
     const createNewDashboard = async () => {
       try {
-
-        
         const dashboardName = `New Dashboard ${new Date().toLocaleString()}`;
-        const { json } = await SupersetClient.post({
-          endpoint: '/api/v1/dashboard/',
-          postPayload: {
-            dashboard_title: dashboardName,
+        const apiUrl = (import.meta as any).env.VITE_API_URL || 'http://localhost:8000';
+
+        // Get auth token from localStorage
+        const token = localStorage.getItem('access_token');
+
+        const response = await fetch(`${apiUrl}/dashboard/create_dashboard`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` }),
           },
+          body: JSON.stringify({
+            name: dashboardName,
+          }),
         });
 
-        const dashboardId = json?.id;
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const json = await response.json();
+        const dashboardId = json?.superset_dashboard_id;
 
         if (dashboardId) {
           toggleEditMode();
