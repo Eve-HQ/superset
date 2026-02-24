@@ -279,8 +279,18 @@ class ChartRenderer extends Component {
   render() {
     const { chartAlert, chartStatus, chartId, emitCrossFilters } = this.props;
 
-    // Skip chart rendering
-    if (chartStatus === 'loading' || !!chartAlert || chartStatus === null) {
+    // Allow rendering when we have valid data, even if chartStatus is slightly behind
+    const hasValidData =
+      this.props.queriesResponse?.[0]?.data?.length > 0 &&
+      !this.props.queriesResponse?.[0]?.error;
+
+    // Skip chart rendering only when clearly loading/failed, or when no data yet
+    if (
+      chartStatus === 'loading' ||
+      chartStatus === 'failed' ||
+      (!!chartAlert && !hasValidData) ||
+      (chartStatus === null && !hasValidData)
+    ) {
       return null;
     }
 
@@ -303,6 +313,7 @@ class ChartRenderer extends Component {
     const currentFormData =
       chartIsStale && latestQueryFormData ? latestQueryFormData : formData;
     const vizType = currentFormData.viz_type || this.props.vizType;
+    
 
     // It's bad practice to use unprefixed `vizType` as classnames for chart
     // container. It may cause css conflicts as in the case of legacy table chart.
@@ -394,7 +405,11 @@ class ChartRenderer extends Component {
             filterState={filterState}
             hooks={this.hooks}
             behaviors={behaviors}
-            queriesData={this.mutableQueriesResponse}
+            queriesData={
+              this.mutableQueriesResponse ??
+              this.props.queriesResponse ??
+              []
+            }
             onRenderSuccess={this.handleRenderSuccess}
             onRenderFailure={this.handleRenderFailure}
             noResults={noResultsComponent}

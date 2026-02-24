@@ -480,8 +480,19 @@ export function exploreJSON(
         const isAbort =
           response?.name === 'AbortError' || response?.statusText === 'abort';
         if (isAbort) {
-          // Abort is expected: filters changed, chart unmounted, etc.
-          return dispatch(chartUpdateStopped(key));
+          // Don't overwrite success with stopped when a superseded request is
+          // aborted - keep showing the chart (e.g. refresh triggered new request)
+          const state = getState();
+          const currentChart = state.charts?.[key];
+          const hasSuccessWithData =
+            currentChart &&
+            ['success', 'rendered'].includes(currentChart.chartStatus) &&
+            currentChart.queriesResponse?.[0]?.data?.length > 0;
+
+          if (!hasSuccessWithData) {
+            return dispatch(chartUpdateStopped(key));
+          }
+          return Promise.resolve();
         }
 
         if (isFeatureEnabled(FeatureFlag.GlobalAsyncQueries)) {

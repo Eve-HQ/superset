@@ -113,6 +113,9 @@ const ChartHolder = ({
   const directPathLastUpdated = useSelector(
     (state: RootState) => state.dashboardState.directPathLastUpdated ?? 0,
   );
+  const chartUpdateEndTime = useSelector(
+    (state: RootState) => state.charts[chartId]?.chartUpdateEndTime ?? 0,
+  );
 
   const [extraControls, setExtraControls] = useState<Record<string, unknown>>(
     {},
@@ -284,6 +287,7 @@ const ChartHolder = ({
             </style>
           )}
           <Chart
+            key={`chart-${chartId}-${chartUpdateEndTime}`}
             componentId={component.id}
             id={component.meta.chartId}
             dashboardId={dashboardId}
@@ -340,6 +344,7 @@ const ChartHolder = ({
       extraControls,
       isInView,
       handleDeleteComponent,
+      chartUpdateEndTime,
     ],
   );
 

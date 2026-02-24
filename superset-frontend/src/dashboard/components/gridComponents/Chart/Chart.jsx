@@ -17,12 +17,12 @@
  * under the License.
  */
 import cx from 'classnames';
-import { useCallback, useEffect, useRef, useMemo, useState, memo } from 'react';
+import { useCallback, useEffect, useRef, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { t, logging } from '@superset-ui/core';
 import { styled } from '@apache-superset/core/ui';
 import { debounce } from 'lodash';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -237,7 +237,7 @@ const Chart = props => {
   const handleDownloadComplete = useCallback(() => {
     boundActionCreators.addSuccessToast(t('CSV file downloaded successfully'));
   }, [boundActionCreators]);
-  const history = useHistory();
+  const navigate = useNavigate();
   const resize = useCallback(
     debounce(() => {
       const { width, height } = props;
@@ -445,7 +445,7 @@ const Chart = props => {
         if (isOpenInNewTab) {
           window.open(url, '_blank', 'noreferrer');
         } else {
-          history.push(url);
+          navigate(url);
         }
       } catch (error) {
         logging.error(error);
@@ -460,7 +460,7 @@ const Chart = props => {
       formData,
       slice.slice_id,
       boundActionCreators.addDangerToast,
-      history,
+      navigate,
     ],
   );
 
@@ -735,24 +735,4 @@ const Chart = props => {
 
 Chart.propTypes = propTypes;
 
-export default memo(Chart, (prevProps, nextProps) => {
-  if (prevProps.cacheBusterProp !== nextProps.cacheBusterProp) {
-    return false;
-  }
-  return (
-    !nextProps.isComponentVisible ||
-    (prevProps.componentId === nextProps.componentId &&
-      prevProps.isComponentVisible &&
-      prevProps.isInView === nextProps.isInView &&
-      prevProps.id === nextProps.id &&
-      prevProps.dashboardId === nextProps.dashboardId &&
-      prevProps.extraControls === nextProps.extraControls &&
-      prevProps.handleToggleFullSize === nextProps.handleToggleFullSize &&
-      prevProps.isFullSize === nextProps.isFullSize &&
-      prevProps.setControlValue === nextProps.setControlValue &&
-      prevProps.sliceName === nextProps.sliceName &&
-      prevProps.updateSliceName === nextProps.updateSliceName &&
-      prevProps.width === nextProps.width &&
-      prevProps.height === nextProps.height)
-  );
-});
+export default Chart;

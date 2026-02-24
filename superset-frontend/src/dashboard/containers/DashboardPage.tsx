@@ -18,7 +18,7 @@
  */
 import { createContext, lazy, FC, useEffect, useMemo, useRef } from 'react';
 import { Global } from '@emotion/react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { t } from '@superset-ui/core';
 import { useTheme } from '@apache-superset/core/ui';
 import { useDispatch, useSelector } from 'react-redux';
@@ -112,7 +112,18 @@ const selectActiveFilters = createSelector(
 export const DashboardPage: FC<PageProps> = ({ idOrSlug }: PageProps) => {
   const theme = useTheme();
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
+const location = useLocation();
+
+const history = useMemo(
+  () => ({
+    push: (to: any) => navigate(to),
+    replace: (to: any) => navigate(to, { replace: true }),
+    location,
+  }),
+  [navigate, location],
+);
+
   const dashboardPageId = useMemo(() => nanoid(), []);
   const hasDashboardInfoInitiated = useSelector<RootState, boolean>(
     ({ dashboardInfo }) =>

@@ -78,6 +78,8 @@ interface ExplorePageState {
 const Styles = styled.div<EchartsStylesProps>`
   height: ${({ height }) => height};
   width: ${({ width }) => width};
+  min-height: 50px;
+  min-width: 50px;
 `;
 
 // eslint-disable-next-line react-hooks/rules-of-hooks -- This is ECharts' use function, not a React hook
@@ -196,6 +198,7 @@ function Echart(
       const getEchartsTheme = (options: any) => {
         const antdTheme = theme;
         const echartsTheme = {
+          backgroundColor: antdTheme?.colorBgContainer ?? 'transparent',
           textStyle: {
             color: antdTheme.colorText,
             fontFamily: antdTheme.fontFamily,
@@ -255,7 +258,13 @@ function Echart(
     }
   }, [didMount, echartOptions, eventHandlers, zrEventHandlers, theme, vizType]);
 
-  useEffect(() => () => chartRef.current?.dispose(), []);
+  useEffect(
+    () => () => {
+      chartRef.current?.dispose();
+      chartRef.current = undefined;
+    },
+    [],
+  );
 
   // highlighting
   useEffect(() => {

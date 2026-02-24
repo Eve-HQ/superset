@@ -170,7 +170,7 @@ const MessageSpan = styled.span`
   color: ${({ theme }) => theme.colorText};
 `;
 
-class Chart extends PureComponent<ChartProps, {}> {
+class Chart extends PureComponent <ChartProps, {}> {
   static defaultProps = defaultProps;
 
   renderStartTime: any;
@@ -294,11 +294,23 @@ class Chart extends PureComponent<ChartProps, {}> {
   }
 
   renderChartContainer() {
+    const hasValidData =
+      Array.isArray(this.props.queriesResponse) &&
+      this.props.queriesResponse.length > 0 &&
+      this.props.queriesResponse[0]?.data?.length > 0 &&
+      !this.props.queriesResponse[0]?.error;
+
+    // Render ChartRenderer when in view OR when we have valid data (avoids
+    // virtualization blocking render when isInView lags behind API response)
+    const shouldRenderChart =
+      this.props.isInView ||
+      hasValidData ||
+      !isFeatureEnabled(FeatureFlag.DashboardVirtualization) ||
+      isCurrentUserBot();
+
     return (
       <div className="slice_container" data-test="slice-container">
-        {this.props.isInView ||
-        !isFeatureEnabled(FeatureFlag.DashboardVirtualization) ||
-        isCurrentUserBot() ? (
+        {shouldRenderChart ? (
           <ChartRenderer
             {...this.props}
             source={this.props.dashboardId ? 'dashboard' : 'explore'}

@@ -154,7 +154,9 @@ function DashboardCard({
     <CardStyles
       onClick={() => {
         if (!bulkSelectEnabled) {
-          navigate(dashboard.url);
+          // navigate(dashboard.url);
+           const url = dashboard.url.replace("/superset/", "/analytics/");
+           navigate(url);
         }
       }}
     >

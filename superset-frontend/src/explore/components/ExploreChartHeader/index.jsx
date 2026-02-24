@@ -17,7 +17,7 @@
  * under the License.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import {
@@ -164,7 +164,19 @@ export const ExploreChartHeader = ({
     setCurrentReportDeleting(null);
   };
 
-  const history = useHistory();
+  const navigate = useNavigate();
+const location = useLocation();
+
+const history = useMemo(
+  () => ({
+    push: to => navigate(to),
+    replace: to => navigate(to, { replace: true }),
+    location,
+  }),
+  [navigate, location],
+);
+
+
   const { redirectSQLLab } = actions;
 
   const redirectToSQLLab = useCallback(

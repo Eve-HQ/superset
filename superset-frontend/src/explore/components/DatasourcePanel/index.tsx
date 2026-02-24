@@ -73,31 +73,38 @@ const DatasourceContainer = styled.div`
     display: flex;
     flex-direction: column;
     max-height: 100%;
+    min-height: 0;   /* ✅ VERY IMPORTANT */
+
     .field-selections {
-      padding: 0 0 ${theme.sizeUnit}px;
-      overflow: auto;
-      height: 100%;
+      flex: 1;       /* ✅ instead of height: 100% */
+      min-height: 0; /* ✅ REQUIRED for AutoSizer in flex */
+      overflow: hidden;
     }
+
     .field-length {
       margin-bottom: ${theme.sizeUnit * 2}px;
       font-size: ${theme.fontSizeSM}px;
       color: ${theme.colorTextTertiary};
     }
+
     .form-control.input-md {
       display: inline-flex;
       width: calc(100% - ${theme.sizeUnit * 8}px);
       height: ${theme.sizeUnit * 8}px;
       margin: ${theme.sizeUnit * 2}px auto;
     }
+
     .type-label {
       font-size: ${theme.fontSizeSM}px;
       color: ${theme.colorTextSecondary};
     }
+
     .Control {
       padding-bottom: 0;
     }
   `};
 `;
+
 
 const StyledInfoboxWrapper = styled.div`
   ${({ theme }) => css`
@@ -296,7 +303,14 @@ export default function DataSourcePanel({
                 }
               />
             </StyledInfoboxWrapper>
+
+
           )}
+
+          {console.log("folders------>",folders)}
+          <div style={{height:"700px"}}>
+
+         
           <AutoSizer>
             {({ height }: { height: number }) => (
               <DatasourceItems
@@ -306,6 +320,8 @@ export default function DataSourcePanel({
               />
             )}
           </AutoSizer>
+
+           </div>
         </div>
       </>
     ),

@@ -18,7 +18,7 @@
  */
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Menu, MenuItem } from '@superset-ui/core/components/Menu';
 import { t } from '@superset-ui/core';
 import { isEmpty } from 'lodash';
@@ -66,7 +66,7 @@ export const useHeaderActionsMenu = ({
   setCurrentReportDeleting,
 }: HeaderDropdownProps) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-  const history = useHistory();
+  const navigate = useNavigate();
   const directPathToChild = useSelector(
     (state: RootState) => state.dashboardState.directPathToChild,
   );
@@ -99,7 +99,7 @@ export const useHeaderActionsMenu = ({
             hash: window.location.hash,
             standalone: isCurrentlyStandalone ? null : 1,
           });
-          history.replace(url);
+          navigate(url, { replace: true });
           break;
         }
         case MenuKeys.ManageEmbedded:
@@ -116,6 +116,7 @@ export const useHeaderActionsMenu = ({
       showPropertiesModal,
       showRefreshModal,
       manageEmbedded,
+      navigate,
     ],
   );
 

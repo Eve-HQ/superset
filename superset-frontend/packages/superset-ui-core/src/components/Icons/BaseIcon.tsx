@@ -35,6 +35,11 @@ const genAriaLabel = (fileName: string) => {
   return name.toLowerCase();
 };
 
+/** Treat string (data URL / path) as image src to avoid createElement InvalidCharacterError. */
+const isIconUrl = (value: unknown): value is string =>
+  typeof value === 'string' &&
+  (value.startsWith('data:') || value.startsWith('http') || value.startsWith('/'));
+
 export const BaseIconComponent: React.FC<
   BaseIconProps & Omit<IconType, 'component'>
 > = ({
@@ -49,13 +54,27 @@ export const BaseIconComponent: React.FC<
   const theme = useTheme();
   const whatRole = rest?.onClick ? 'button' : 'img';
   const ariaLabel = genAriaLabel(fileName || '');
+  const sizePx = iconSize
+    ? `${getFontSize(theme, iconSize) || theme.fontSize}px`
+    : `${theme.fontSize}px`;
   const style = {
     color: iconColor,
-    fontSize: iconSize
-      ? `${getFontSize(theme, iconSize)}px`
-      : `${theme.fontSize}px`,
+    fontSize: sizePx,
     cursor: rest?.onClick ? 'pointer' : undefined,
   };
+
+  if (isIconUrl(Component)) {
+    return (
+      <img
+        src={Component}
+        role={whatRole}
+        style={{ ...style, width: sizePx, height: sizePx }}
+        aria-label={ariaLabel}
+        data-test={ariaLabel}
+        alt=""
+      />
+    );
+  }
 
   return customIcons ? (
     <span
@@ -74,16 +93,8 @@ export const BaseIconComponent: React.FC<
       <Component
         viewBox={viewBox || '0 0 24 24'}
         style={style}
-        width={
-          iconSize
-            ? `${getFontSize(theme, iconSize) || theme.fontSize}px`
-            : `${theme.fontSize}px`
-        }
-        height={
-          iconSize
-            ? `${getFontSize(theme, iconSize) || theme.fontSize}px`
-            : `${theme.fontSize}px`
-        }
+        width={sizePx}
+        height={sizePx}
         {...(rest as CustomIconType)}
       />
     </span>

@@ -376,7 +376,7 @@ class SliceAdder extends Component<SliceAdderProps, SliceAdderState> {
               <Icons.PlusOutlined iconSize="m" iconColor={theme.colorPrimary} />
             }
             onClick={() =>
-              navigateTo(`/chart/add?dashboard_id=${this.props.dashboardId}`, {
+              navigateTo(`/analytics/chart/add?dashboard_id=${this.props.dashboardId}`, {
                 newWindow: true,
               })
             }

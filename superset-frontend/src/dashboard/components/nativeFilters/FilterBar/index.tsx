@@ -39,7 +39,7 @@ import {
 } from '@superset-ui/core';
 import { styled } from '@apache-superset/core/ui';
 import { Constants } from '@superset-ui/core/components';
-import { useHistory } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { updateDataMask } from 'src/dataMask/actions';
 import { triggerQuery } from 'src/components/Chart/chartAction';
 import {
@@ -89,17 +89,16 @@ const EXCLUDED_URL_PARAMS: string[] = [
 
 const publishDataMask = debounce(
   async (
-    history,
+    navigate,
+    location,
     dashboardId,
     updateKey,
     dataMaskSelected: DataMaskStateWithId,
     tabId,
   ) => {
-    const { location } = history;
-    const { search } = location;
-    const previousParams = new URLSearchParams(search);
+    const previousParams = new URLSearchParams(location.search);
     const newParams = new URLSearchParams();
-    let dataMaskKey: string | null;
+
     previousParams.forEach((value, key) => {
       if (!EXCLUDED_URL_PARAMS.includes(key)) {
         newParams.append(key, value);
@@ -108,6 +107,9 @@ const publishDataMask = debounce(
 
     const nativeFiltersCacheKey = getUrlParam(URL_PARAMS.nativeFiltersKey);
     const dataMask = JSON.stringify(dataMaskSelected);
+
+    let dataMaskKey: string | null;
+
     if (
       updateKey &&
       nativeFiltersCacheKey &&
@@ -122,28 +124,26 @@ const publishDataMask = debounce(
     } else {
       dataMaskKey = await createFilterKey(dashboardId, dataMask, tabId);
     }
+
     if (dataMaskKey) {
       newParams.set(URL_PARAMS.nativeFiltersKey.name, dataMaskKey);
     }
 
-    // pathname could be updated somewhere else through window.history
-    // keep react router history in sync with window history
-    // replace params only when current page is /superset/dashboard
-    // this prevents a race condition between updating filters and navigating to Explore
     if (window.location.pathname.includes('/superset/dashboard')) {
-      // The history API is part of React router and understands that a basename may exist.
-      // Internally it treats all paths as if they are relative to the root and appends
-      // it when necessary. We strip any prefix so that history.replace adds it back and doesn't
-      // double it up.
       const appRoot = applicationRoot();
-      let replacement_pathname = window.location.pathname;
-      if (appRoot !== '/' && replacement_pathname.startsWith(appRoot)) {
-        replacement_pathname = replacement_pathname.substring(appRoot.length);
+      let replacementPathname = window.location.pathname;
+
+      if (appRoot !== '/' && replacementPathname.startsWith(appRoot)) {
+        replacementPathname = replacementPathname.substring(appRoot.length);
       }
-      history.location.pathname = replacement_pathname;
-      history.replace({
-        search: newParams.toString(),
-      });
+
+      navigate(
+        {
+          pathname: replacementPathname,
+          search: `?${newParams.toString()}`,
+        },
+        { replace: true },
+      );
     }
   },
   Constants.SLOW_DEBOUNCE,
@@ -154,7 +154,8 @@ const FilterBar: FC<FiltersBarProps> = ({
   verticalConfig,
   hidden = false,
 }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const dataMaskApplied: DataMaskStateWithId = useNativeFiltersDataMask();
   const [dataMaskSelected, setDataMaskSelected] =
     useImmer<DataMaskStateWithId>(dataMaskApplied);
@@ -293,12 +294,18 @@ const FilterBar: FC<FiltersBarProps> = ({
   }, [dataMaskAppliedText, setDataMaskSelected, dashboardId]);
 
   useEffect(() => {
-    // embedded users can't persist filter combinations
     if (user?.userId) {
-      publishDataMask(history, dashboardId, updateKey, dataMaskApplied, tabId);
+      publishDataMask(
+        navigate,
+        location,
+        dashboardId,
+        updateKey,
+        dataMaskApplied,
+        tabId,
+      );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dashboardId, dataMaskAppliedText, history, updateKey, tabId]);
+  }, [dashboardId, dataMaskAppliedText, navigate, location, updateKey, tabId]);
+  
 
   const pendingChartCustomizations = useSelector<
     RootState,

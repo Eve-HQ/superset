@@ -135,11 +135,11 @@ export default function transformProps(
     columnFormats = {},
     currencyFormats = {},
   } = datasource;
-  const [queryData] = queriesData;
+  const [queryData] = queriesData || [];
   const { data = [], label_map = {} } =
-    queryData as TimeseriesChartDataResponseResult;
+    (queryData as TimeseriesChartDataResponseResult) || {};
 
-  const dataTypes = getColtypesMapping(queryData);
+  const dataTypes = queryData ? getColtypesMapping(queryData) : {};
   const annotationData = getAnnotationData(chartProps);
 
   const {
@@ -216,7 +216,11 @@ export default function transformProps(
     }
     return { ...acc, [entry[0]]: entry[1] };
   }, {});
-  const colorScale = CategoricalColorNamespace.getScale(colorScheme as string);
+  const colorScale = CategoricalColorNamespace.getScale(
+    colorScheme && String(colorScheme).trim()
+      ? (colorScheme as string)
+      : 'supersetColors',
+  );
   const rebasedData = rebaseForecastDatum(data, verboseMap);
   let xAxisLabel = getXAxisLabel(chartProps.rawFormData) as string;
   if (
@@ -259,6 +263,7 @@ export default function transformProps(
       xAxisType,
     },
   );
+
   const showValueIndexes = extractShowValueIndexes(rawSeries, {
     stack,
     onlyTotal,
@@ -747,9 +752,13 @@ export default function transformProps(
       : [],
   };
 
+  console.log('👉 final built series:', series);
+
   const onFocusedSeries = (seriesName: string | null) => {
     focusedSeries = seriesName;
   };
+  console.log('⛔ FINAL series sent to ECharts:', series);
+console.groupEnd();
   return {
     echartOptions,
     emitCrossFilters,

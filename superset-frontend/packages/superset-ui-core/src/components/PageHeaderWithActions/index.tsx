@@ -51,7 +51,7 @@ const headerStyles = (theme: SupersetTheme) => css`
   justify-content: space-between;
   background-color: ${theme.colorBgContainer};
   height: ${theme.sizeUnit * 16}px;
-  padding: 0 ${theme.sizeUnit * 4}px;
+      padding: 0px 20px 0 20px;
 
   .editable-title {
     overflow: hidden;

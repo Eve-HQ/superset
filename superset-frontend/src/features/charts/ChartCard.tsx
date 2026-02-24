@@ -35,6 +35,7 @@ import Chart from 'src/types/Chart';
 import { FacePile } from 'src/components';
 import { handleChartDelete, CardStyles } from 'src/views/CRUD/utils';
 import { assetUrl } from 'src/utils/assetUrl';
+import { navigateTo } from 'src/utils/navigationUtils';
 
 interface ChartCardProps {
   chart: Chart;
@@ -168,7 +169,8 @@ export default function ChartCard({
     <CardStyles
       onClick={() => {
         if (!bulkSelectEnabled && chart.url) {
-          navigate(chart.url);
+          // navigate(chart.url);
+        navigateTo(`/analytics${chart.url}`);
         }
       }}
     >

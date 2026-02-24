@@ -27,7 +27,7 @@ import {
 
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { pick } from 'lodash';
 import {
   Button,
@@ -235,7 +235,7 @@ const ResultSet = ({
   const [showSaveDatasetModal, setShowSaveDatasetModal] = useState(false);
   const [showStreamingModal, setShowStreamingModal] = useState(false);
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const logAction = useLogAction({ queryId, sqlEditorId: query.sqlEditorId });
   const { showConfirm, ConfirmModal } = useConfirmModal();
@@ -294,14 +294,13 @@ const ResultSet = ({
 
   const createExploreResultsOnClick = async (clickEvent: MouseEvent) => {
     const { results } = query;
-
+  
     const openInNewWindow = clickEvent.metaKey;
     logAction(LOG_ACTIONS_SQLLAB_CREATE_CHART, {});
     if (results?.query_id) {
       const key = await postFormData(results.query_id, 'query', {
         ...EXPLORE_CHART_DEFAULT,
         datasource: `${results.query_id}__query`,
-
         all_columns: results.columns.map(column => column.column_name),
       });
       const url = mountExploreUrl(null, {
@@ -310,7 +309,7 @@ const ResultSet = ({
       if (openInNewWindow) {
         window.open(url, '_blank', 'noreferrer');
       } else {
-        history.push(url);
+        navigate(url);
       }
     } else {
       addDangerToast(t('Unable to create chart without a query id.'));

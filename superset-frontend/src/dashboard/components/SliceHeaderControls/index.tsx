@@ -25,7 +25,7 @@ import {
   RefObject,
 } from 'react';
 
-import { RouteComponentProps, useHistory } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
 import { extendedDayjs } from '@superset-ui/core/utils/dates';
 import {
   Behavior,
@@ -139,8 +139,7 @@ export interface SliceHeaderControlsProps {
 
   crossFiltersEnabled?: boolean;
 }
-type SliceHeaderControlsPropsWithRouter = SliceHeaderControlsProps &
-  RouteComponentProps;
+type SliceHeaderControlsPropsWithRouter = SliceHeaderControlsProps 
 
 const dropdownIconsStyles = css`
   &&.anticon > .anticon:first-child {
@@ -158,7 +157,7 @@ const SliceHeaderControls = (
   const [openScopingModal, scopingModal] = useCrossFiltersScopingModal(
     props.slice.slice_id,
   );
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const queryMenuRef: RefObject<any> = useRef(null);
   const resultsMenuRef: RefObject<any> = useRef(null);
@@ -219,7 +218,7 @@ const SliceHeaderControls = (
           domEvent.preventDefault();
           window.open(props.exploreUrl, '_blank');
         } else {
-          history.push(props.exploreUrl);
+          navigate(props.exploreUrl);
         }
         break;
       case MenuKeys.ExportCsv:
